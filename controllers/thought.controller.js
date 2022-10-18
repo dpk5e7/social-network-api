@@ -54,21 +54,33 @@ module.exports = {
       .then((thought) =>
         !thought
           ? res.status(404).json({ message: "No thought with this id!" })
-          : res.json(course)
+          : res.json(thought)
       )
       .catch((err) => res.status(500).json(err));
   },
 
   // Delete a thought
-  deleteThought(req, res) {
-    Thought.findByIdAndRemove(req.params.thoughtId)
-      .then((thought) =>
-        !thought
-          ? res.status(404).json({ message: "No course with that ID" })
-          : Student.deleteMany({ _id: { $in: course.students } })
-      )
-      .then(() => res.json({ message: "Thought deleted!" }))
-      .catch((err) => res.status(500).json(err));
+  async deleteThought(req, res) {
+    try {
+      const thought = await Thought.findByIdAndRemove(req.params.thoughtId);
+      //console.log(thought);
+
+      if (thought) {
+        const user = await User.updateOne(
+          { username: thought.username },
+          {
+            $pull: { thoughts: req.params.thoughtId },
+          }
+        );
+        //console.log(user);
+      } else {
+        res.status(404).json({ message: "No such thought exists" });
+      }
+      res.json({ message: "Thought successfully deleted" });
+    } catch (err) {
+      console.log(err);
+      res.status(500).json(err);
+    }
   },
 
   // create a reaction

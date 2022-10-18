@@ -39,7 +39,7 @@ module.exports = {
   // Update user
   updateUser(req, res) {
     User.findByIdAndUpdate(
-      req.params.userId,
+      ObjectId(req.params.userId),
       { $set: req.body },
       { runValidators: true, new: true }
     )
@@ -52,23 +52,31 @@ module.exports = {
   },
 
   // Delete a user and remove their thoughts
-  deleteUser(req, res) {
-    User.findByIdAndRemove(req.params.userId)
-      .then(function (user) {
-        if (user) {
-          // Delete all thoughts
-          Thought.deleteMany({ username: user.username });
+  async deleteUser(req, res) {
+    try {
+      const user = await User.findByIdAndRemove(req.params.userId);
 
-          // Delete all references in other user's friend array
-        } else {
-          res.status(404).json({ message: "No such user exists" });
-        }
-        res.json({ message: "User successfully deleted" });
-      })
-      .catch((err) => {
-        console.log(err);
-        res.status(500).json(err);
-      });
+      if (user) {
+        // Delete all thoughts
+        const thoughts = await Thought.deleteMany({ username: user.username });
+        //console.log(thoughts);
+
+        // Delete all references in other user's friend array
+        const friends = await User.updateMany(
+          {},
+          {
+            $pull: { friends: req.params.userId },
+          }
+        );
+        //console.log(friends);
+      } else {
+        res.status(404).json({ message: "No such user exists" });
+      }
+      res.json({ message: "User successfully deleted" });
+    } catch (err) {
+      console.log(err);
+      res.status(500).json(err);
+    }
   },
 
   // create a friend
