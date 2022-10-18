@@ -18,8 +18,6 @@ module.exports = {
   // Get a single user
   getSingleUser(req, res) {
     User.findById(req.params.userId)
-      .select("-__v")
-      .lean()
       .then(async (user) =>
         !user
           ? res.status(404).json({ message: "No user with that ID" })
@@ -92,7 +90,10 @@ module.exports = {
   deleteFriend(req, res) {
     User.findByIdAndUpdate(
       req.params.userId,
-      { $pull: { friends: req.params.friendId } }
+      {
+        $pull: { friends: req.params.friendId },
+      },
+      { returnDocument: "after" }
     )
       .then((user) =>
         !user

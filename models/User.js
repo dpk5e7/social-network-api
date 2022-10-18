@@ -1,13 +1,9 @@
-const { Schema, model } = require("mongoose");
-const Thought = require("./Thought");
+const { Schema, model, Types } = require("mongoose");
+//const Thought = require("./Thought");
 
 // Schema to create Student model
 const userSchema = new Schema(
   {
-    userId: {
-      type: Schema.Types.ObjectId,
-      default: () => new Types.ObjectId(),
-    },
     username: {
       type: String,
       required: true,
@@ -24,8 +20,13 @@ const userSchema = new Schema(
         message: (props) => `${props.value} is not a valid email address!`,
       },
     },
-    thoughts: [Thought],
-    friends: [userSchema],
+    thoughts: [
+      {
+        type: Schema.Types.ObjectId, // Change from tags
+        ref: "Thought",
+      },
+    ],
+    friends: [this],
   },
   {
     toJSON: {
