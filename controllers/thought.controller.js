@@ -117,7 +117,7 @@ module.exports = {
 
       // Get the reaction you want to delete
       const result = thought.reactions.find(
-        (reaction) => reaction._id == req.params.reactionId
+        (reaction) => reaction.reactionId == req.params.reactionId
       );
 
       // Delete the reaction from the reactions array

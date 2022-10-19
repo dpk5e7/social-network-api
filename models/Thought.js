@@ -3,11 +3,10 @@ const { Schema, model, Types } = require("mongoose");
 // Schema to create a reaction
 const reactionSchema = new Schema(
   {
-    // This field is in the README requirements, but it's uneccessary since Mongoose creates a _id field.
-    // reactionId: {
-    //   type: Schema.Types.ObjectId,
-    //   default: () => new Types.ObjectId(),
-    // },
+    reactionId: {
+      type: Schema.Types.ObjectId,
+      default: () => new Types.ObjectId(),
+    },
     reactionBody: {
       type: String,
       required: true,
@@ -27,7 +26,7 @@ const reactionSchema = new Schema(
     toJSON: {
       getters: true,
     },
-    id: false,
+    _id: false,
   }
 );
 
