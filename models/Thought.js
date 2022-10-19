@@ -1,7 +1,9 @@
 const { Schema, model, Types } = require("mongoose");
 
+// Schema to create a reaction
 const reactionSchema = new Schema(
   {
+    // This field is in the README requirements, but it's uneccessary since Mongoose creates a _id field.
     // reactionId: {
     //   type: Schema.Types.ObjectId,
     //   default: () => new Types.ObjectId(),
@@ -29,6 +31,7 @@ const reactionSchema = new Schema(
   }
 );
 
+// Schema to create a Thought model
 const thoughtSchema = new Schema(
   {
     thoughtText: {
@@ -57,10 +60,12 @@ const thoughtSchema = new Schema(
   }
 );
 
+// Customer getter to return a more compact string.
 function formatDate(createdAt) {
   return createdAt.toLocaleString();
 }
 
+// Virtual to return the number of reactions for this thought
 thoughtSchema.virtual("reactionCount").get(function () {
   return this.reactions.length;
 });

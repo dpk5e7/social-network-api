@@ -1,3 +1,4 @@
+const { ObjectId } = require("mongoose").Types;
 const { User, Thought } = require("../models");
 
 module.exports = {
@@ -15,7 +16,7 @@ module.exports = {
 
   // Get a thought
   getSingleThought(req, res) {
-    Thought.findById(req.params.thoughtId)
+    Thought.findById(ObjectId(req.params.thoughtId))
       .then((thought) =>
         !thought
           ? res.status(404).json({ message: "No thought with that ID" })
@@ -29,10 +30,9 @@ module.exports = {
     Thought.create(req.body)
       .then(async function (thought) {
         // Update User's thought array
-
         await User.findOneAndUpdate(
           { username: req.body.username },
-          { $addToSet: { thoughts: thought._id } },
+          { $addToSet: { thoughts: ObjectId(thought._id) } },
           { runValidators: true, new: true }
         );
 
@@ -47,7 +47,7 @@ module.exports = {
   // Update a thought
   updateThought(req, res) {
     Thought.findByIdAndUpdate(
-      req.params.thoughtId,
+      ObjectId(req.params.thoughtId),
       { $set: req.body },
       { runValidators: true, new: true }
     )
@@ -62,21 +62,25 @@ module.exports = {
   // Delete a thought
   async deleteThought(req, res) {
     try {
-      const thought = await Thought.findByIdAndRemove(req.params.thoughtId);
-      //console.log(thought);
+      const thought = await Thought.findByIdAndRemove(
+        ObjectId(req.params.thoughtId)
+      );
+      // console.log(thought);
 
       if (thought) {
+        // Remove the thought from the User's thought array
+        // Not part of the requirements, but doing it anyway to keep the database clean
         const user = await User.updateOne(
           { username: thought.username },
           {
-            $pull: { thoughts: req.params.thoughtId },
+            $pull: { thoughts: ObjectId(req.params.thoughtId) },
           }
         );
-        //console.log(user);
+        // console.log(user);
       } else {
         res.status(404).json({ message: "No such thought exists" });
       }
-      res.json({ message: "Thought successfully deleted" });
+      res.status(200).json({ message: "Thought successfully deleted" });
     } catch (err) {
       console.log(err);
       res.status(500).json(err);
@@ -86,7 +90,7 @@ module.exports = {
   // create a reaction
   createReaction(req, res) {
     Thought.findByIdAndUpdate(
-      req.params.thoughtId,
+      ObjectId(req.params.thoughtId),
       {
         $addToSet: {
           reactions: {
@@ -99,9 +103,7 @@ module.exports = {
     )
       .then((thought) =>
         !thought
-          ? res
-              .status(404)
-              .json({ message: "No thought found with that ID :(" })
+          ? res.status(404).json({ message: "No thought found with that ID." })
           : res.json(thought)
       )
       .catch((err) => res.status(500).json(err));
@@ -110,14 +112,20 @@ module.exports = {
   // delete a reaction
   async deleteReaction(req, res) {
     try {
-      const thought = await Thought.findById(req.params.thoughtId);
+      // Find the thought
+      const thought = await Thought.findById(ObjectId(req.params.thoughtId));
 
-      const result = thought.reactions.find((reaction) => reaction._id == req.params.reactionId);
+      // Get the reaction you want to delete
+      const result = thought.reactions.find(
+        (reaction) => reaction._id == req.params.reactionId
+      );
 
+      // Delete the reaction from the reactions array
       thought.reactions.remove(result);
 
+      // Save the thought
       thought.save();
-      
+
       res.json(thought);
     } catch (err) {
       res.status(500).json(err);

@@ -1,7 +1,6 @@
 const { Schema, model, Types } = require("mongoose");
-//const Thought = require("./Thought");
 
-// Schema to create Student model
+// Schema to create User model
 const userSchema = new Schema(
   {
     username: {
@@ -22,11 +21,11 @@ const userSchema = new Schema(
     },
     thoughts: [
       {
-        type: Schema.Types.ObjectId, // Change from tags
+        type: Schema.Types.ObjectId,
         ref: "Thought",
       },
     ],
-    friends: [this],
+    friends: [this], // self reference
   },
   {
     toJSON: {
@@ -37,6 +36,7 @@ const userSchema = new Schema(
   }
 );
 
+// Virtual to return the user's number of friends
 userSchema.virtual("friendCount").get(function () {
   return this.friends.length;
 });

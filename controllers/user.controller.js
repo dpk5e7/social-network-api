@@ -1,4 +1,3 @@
-// ObjectId() method for converting studentId string into an ObjectId for querying database
 const { ObjectId } = require("mongoose").Types;
 const { User, Thought } = require("../models");
 
@@ -17,7 +16,7 @@ module.exports = {
 
   // Get a single user
   getSingleUser(req, res) {
-    User.findById(req.params.userId)
+    User.findById(ObjectId(req.params.userId))
       .then(async (user) =>
         !user
           ? res.status(404).json({ message: "No user with that ID" })
@@ -54,12 +53,12 @@ module.exports = {
   // Delete a user and remove their thoughts
   async deleteUser(req, res) {
     try {
-      const user = await User.findByIdAndRemove(req.params.userId);
+      const user = await User.findOneAndRemove({ _id: ObjectId(req.params.userId) });
 
       if (user) {
         // Delete all thoughts
         const thoughts = await Thought.deleteMany({ username: user.username });
-        //console.log(thoughts);
+        // console.log(thoughts);
 
         // Delete all references in other user's friend array
         const friends = await User.updateMany(
@@ -82,8 +81,8 @@ module.exports = {
   // create a friend
   createFriend(req, res) {
     User.findByIdAndUpdate(
-      req.params.userId,
-      { $addToSet: { friends: req.params.friendId } },
+      ObjectId(req.params.userId),
+      { $addToSet: { friends: ObjectId(req.params.friendId) } },
       { runValidators: true, new: true }
     )
       .then((user) =>
@@ -97,9 +96,9 @@ module.exports = {
   // delete a friend
   deleteFriend(req, res) {
     User.findByIdAndUpdate(
-      req.params.userId,
+      ObjectId(req.params.userId),
       {
-        $pull: { friends: req.params.friendId },
+        $pull: { friends: ObjectId(req.params.friendId) },
       },
       { returnDocument: "after" }
     )
