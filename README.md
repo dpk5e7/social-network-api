@@ -4,7 +4,7 @@
 
 ## Description
 
-This project is an API for a social network web application where users can share their thoughts, react to friends’ thoughts, and create a friend list. The goal of this project ws to understand the unstructured nature of NoSQL.
+This project is an API for a social network web application where users can share their thoughts, react to friends’ thoughts, and create a friend list. The goal of this project was to understand the unstructured nature of NoSQL.
 
 The technologies used in this application are:
 
