@@ -74,7 +74,7 @@ As there is no public-facing views in this project, the user will need to consum
 
 ### Video Walkthrough
 
-[WEBM Video Link](https://drive.google.com/file/d/1nw81LaB4WPFUuHEwkyNJ2Fyk6IT7VxJa/view)
+[WEBM Video Link](https://drive.google.com/file/d/1fnLfsiL5PrnRFnZ65Q_BJ0EK6vPMZh5m/view)
 
 ## License
 
