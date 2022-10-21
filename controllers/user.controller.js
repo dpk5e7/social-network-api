@@ -5,6 +5,8 @@ module.exports = {
   // Get all users
   getUsers(req, res) {
     User.find()
+      .populate("thoughts")
+      .populate("friends")
       .then(async (users) => {
         return res.json(users);
       })
@@ -17,6 +19,8 @@ module.exports = {
   // Get a single user
   getSingleUser(req, res) {
     User.findById(ObjectId(req.params.userId))
+      .populate("thoughts")
+      .populate("friends")
       .then(async (user) =>
         !user
           ? res.status(404).json({ message: "No user with that ID" })
@@ -53,7 +57,9 @@ module.exports = {
   // Delete a user and remove their thoughts
   async deleteUser(req, res) {
     try {
-      const user = await User.findOneAndRemove({ _id: ObjectId(req.params.userId) });
+      const user = await User.findOneAndRemove({
+        _id: ObjectId(req.params.userId),
+      });
 
       if (user) {
         // Delete all thoughts
